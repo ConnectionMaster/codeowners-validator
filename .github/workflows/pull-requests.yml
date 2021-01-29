@@ -4,14 +4,40 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  GO111MODULE: on
+  INSTALL_DEPS: true
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  go-test:
+    strategy:
+      matrix:
+        go-version: [1.14.x, 1.15.x]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.15
-    - name: "Initial Action Step"
-      run: echo "Initial Action"
+        go-version: ${{ matrix.go-version }}
+    - name: "Build and unit-test with Go ${{ matrix.go-version }}"
+      run: make test-unit
+    - name: "Hammer unit-test with ${{ matrix.go-version }}"
+      run: make test-hammer
+    - name: "Integration testing with ${{ matrix.go-version }}"
+      run: make test-integration
+  quality:
+    strategy:
+      matrix:
+        go-version: [1.14.x, 1.15.x]
+        os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: "Code Quality Analysis"
+        run: make test-lint
