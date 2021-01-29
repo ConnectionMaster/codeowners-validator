@@ -26,6 +26,8 @@ jobs:
     - name: "Hammer unit-test with ${{ matrix.go-version }}"
       run: make test-hammer
     - name: "Integration testing with ${{ matrix.go-version }}"
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN_INTEGRATION_TESTS }}
       run: make test-integration
   quality:
     strategy:
