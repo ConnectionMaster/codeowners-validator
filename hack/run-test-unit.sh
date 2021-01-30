@@ -33,6 +33,7 @@ function test::go_modules() {
   go mod tidy
   STATUS=$(git status --porcelain go.mod go.sum)
   if [ -n "$STATUS" ]; then
+    git diff
     echo -e "${RED}✗ go mod tidy modified go.mod and/or go.sum${NC}"
     exit 1
   else
