@@ -30,10 +30,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go-version: [1.14.x, 1.15.x]
+#        go-version: [1.14.x, 1.15.x]
+        go-version: [1.14.x]
 #        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: windows-latest
-#    runs-on: ${{ matrix.os }}
+        os: [windows-latest]
+    runs-on: ${{ matrix.os }}
 #    needs: ["unit-tests"]
     steps:
       - name: Set git to use LF
@@ -48,11 +49,13 @@ jobs:
       - name: "Integration testing with ${{ matrix.go-version }}"
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_INTEGRATION_TESTS }}
-          BINARY_PATH: "./codeowners-validator.exe"
+          BINARY_PATH: "/bin/codeowners-validator"
 #        run: make test-integration
         run: |
-          go build -o ./codeowners-validator.exe ./main.go
-          echo $(pwd)
+          ls
+          go build -o /bin/codeowners-validator ./main.go
+          echo $(PWD)
+          ls
           go test ./tests/integration/... -v -tags=integration
         #    - stage: test-integration
         #      name: "Integration testing on Windows"

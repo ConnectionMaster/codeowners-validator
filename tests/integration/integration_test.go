@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -16,6 +17,13 @@ const (
 	binaryPathEnvName     = "BINARY_PATH"
 	codeownersSamplesRepo = "https://github.com/gh-codeowners/codeowners-samples.git"
 )
+
+func Test(t *testing.T) {
+	fmt.Println(`os.Getenv("BINARY_PATH")`)
+	fmt.Println(os.Getenv("BINARY_PATH"))
+	fmt.Println(`os.Getwd()`)
+	fmt.Println(os.Getwd())
+}
 
 // TestCheckHappyPath tests that codeowners-validator reports no issues for valid CODEOWNERS file.
 //
