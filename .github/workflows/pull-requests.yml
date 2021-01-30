@@ -9,31 +9,32 @@ env:
   INSTALL_DEPS: true
 
 jobs:
-  unit-tests:
-    strategy:
-      fail-fast: false
-      matrix:
-        go-version: [1.14.x, 1.15.x]
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: ${{ matrix.go-version }}
-    - name: "Build and unit-test with Go ${{ matrix.go-version }}"
-      run: make test-unit
-    - name: "Hammer unit-test with ${{ matrix.go-version }}"
-      run: make test-hammer
+#  unit-tests:
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        go-version: [1.14.x, 1.15.x]
+#        os: [ubuntu-latest, macos-latest]
+#    runs-on: ${{ matrix.os }}
+#    steps:
+#    - uses: actions/checkout@v2
+#    - name: Set up Go
+#      uses: actions/setup-go@v2
+#      with:
+#        go-version: ${{ matrix.go-version }}
+#    - name: "Build and unit-test with Go ${{ matrix.go-version }}"
+#      run: make test-unit
+#    - name: "Hammer unit-test with ${{ matrix.go-version }}"
+#      run: make test-hammer
   integration-test:
     strategy:
       fail-fast: false
       matrix:
         go-version: [1.14.x, 1.15.x]
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    needs: ["unit-tests"]
+#        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: windows-latest
+#    runs-on: ${{ matrix.os }}
+#    needs: ["unit-tests"]
     steps:
       - name: Set git to use LF
         run: |
@@ -47,18 +48,31 @@ jobs:
       - name: "Integration testing with ${{ matrix.go-version }}"
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_INTEGRATION_TESTS }}
-        run: make test-integration
-  quality:
-    strategy:
-      fail-fast: false
-      matrix:
-        go-version: [1.14.x, 1.15.x]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go-version }}
-      - name: "Code Quality Analysis"
-        run: make test-lint
+          BINARY_PATH: "./codeowners-validator.exe"
+#        run: make test-integration
+        run: |
+          go build -o ./codeowners-validator.exe ./main.go
+          echo $(pwd)
+          go test ./tests/integration/... -v -tags=integration
+        #    - stage: test-integration
+        #      name: "Integration testing on Windows"
+        #      before_install:
+        #        - export "BINARY_PATH=$TRAVIS_BUILD_DIR/codeowners-validator.exe"
+        #      script:
+        #        - go build -o codeowners-validator.exe ./main.go
+        #        - echo $(pwd)
+        #        - go test ./tests/integration/... -v -tags=integration
+#  quality:
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        go-version: [1.14.x, 1.15.x]
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Set up Go
+#        uses: actions/setup-go@v2
+#        with:
+#          go-version: ${{ matrix.go-version }}
+#      - name: "Code Quality Analysis"
+#        run: make test-lint
