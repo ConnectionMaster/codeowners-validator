@@ -8,12 +8,17 @@ export GOPROXY = https://proxy.golang.org
 all: build-race test-unit test-integration test-lint
 .PHONY: all
 
+# When running integration tests on windows machine
+# it cannot execute binary without extension.
+# It needs to be parametrized, so we can override it on CI.
+export BINARY_PATH ?= ./codeowners-validator
+
 ############
 # Building #
 ############
 
 build:
-	go build -o codeowners-validator ./main.go
+	go build -o $(BINARY_PATH) ./main.go
 .PHONY: build
 
 build-race:
@@ -29,7 +34,7 @@ test-unit:
 .PHONY: test-unit
 
 test-integration: build
-	env BINARY_PATH=$(PWD)/codeowners-validator ./hack/run-test-integration.sh
+	./hack/run-test-integration.sh
 .PHONY: test-integration
 
 test-lint:

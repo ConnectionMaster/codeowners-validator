@@ -30,10 +30,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-#        go-version: [1.14.x, 1.15.x]
-        go-version: [1.14.x]
-#        os: [ubuntu-latest, macos-latest, windows-latest]
-        os: [windows-latest]
+        go-version: [1.14.x, 1.15.x]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
 #    needs: ["unit-tests"]
     steps:
@@ -46,25 +44,12 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go-version }}
+      - if: matrix.os == 'windows-latest'
+        run: echo "BINARY_PATH=/bin/codeowners-validator.exe" >> $GITHUB_ENV
       - name: "Integration testing with ${{ matrix.go-version }}"
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_INTEGRATION_TESTS }}
-          BINARY_PATH: "/bin/codeowners-validator"
-#        run: make test-integration
-        run: |
-          ls
-          go build -o /bin/codeowners-validator ./main.go
-          echo $(PWD)
-          ls
-          go test ./tests/integration/... -v -tags=integration
-        #    - stage: test-integration
-        #      name: "Integration testing on Windows"
-        #      before_install:
-        #        - export "BINARY_PATH=$TRAVIS_BUILD_DIR/codeowners-validator.exe"
-        #      script:
-        #        - go build -o codeowners-validator.exe ./main.go
-        #        - echo $(pwd)
-        #        - go test ./tests/integration/... -v -tags=integration
+        run: make test-integration
 #  quality:
 #    strategy:
 #      fail-fast: false
